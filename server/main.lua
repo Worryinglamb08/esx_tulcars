@@ -1,12 +1,12 @@
 ESX = nil
 
-TriggerEvent("pz:getSharedObject", function(response)
+TriggerEvent("esx:getSharedObject", function(response)
     ESX = response
 end)
 
 local VehiclesForSale = 0
 
-ESX.RegisterServerCallback("pz_tulcars:retrieveVehicles", function(source, cb)
+ESX.RegisterServerCallback("esx_tulcars:retrieveVehicles", function(source, cb)
     MySQL.Async.fetchAll("SELECT id, seller, vehicleProps, price FROM tulcars_cars", {}, function(result)
         local vehicleTable = {}
 
@@ -22,7 +22,7 @@ ESX.RegisterServerCallback("pz_tulcars:retrieveVehicles", function(source, cb)
     end)
 end)
 
-ESX.RegisterServerCallback("pz_tulcars:IsVehiclePlayerProperty", function(source, cb, plate)
+ESX.RegisterServerCallback("esx_tulcars:IsVehiclePlayerProperty", function(source, cb, plate)
 	local src = source
 	local xPlayer = ESX.GetPlayerFromId(src)
 	local isPlayerProperty = false
@@ -38,7 +38,7 @@ ESX.RegisterServerCallback("pz_tulcars:IsVehiclePlayerProperty", function(source
 	end)
 end)
 
-ESX.RegisterServerCallback("pz_tulcars:TryToCreateOffer", function(source, cb, vehicleProps, price, placeID)
+ESX.RegisterServerCallback("esx_tulcars:TryToCreateOffer", function(source, cb, vehicleProps, price, placeID)
 	local src = source
 	local xPlayer = ESX.GetPlayerFromId(src)
     local plate = vehicleProps["plate"]
@@ -56,13 +56,13 @@ ESX.RegisterServerCallback("pz_tulcars:TryToCreateOffer", function(source, cb, v
                 )
   
 				MySQL.Async.execute('DELETE FROM owned_vehicles WHERE plate = @plate', { ["@plate"] = plate})
-                TriggerClientEvent("pz_tulcars:refreshVehicles", -1)
+                TriggerClientEvent("esx_tulcars:refreshVehicles", -1)
 				if xPlayer.getMoney() < 300 then
 					xPlayer.removeAccountMoney('bank', 300)
 				else
 					xPlayer.removeMoney(300)
 				end			
-				TriggerEvent('pz_addonaccount:getSharedAccount', 'society_cardealer', function(account)
+				TriggerEvent('esx_addonaccount:getSharedAccount', 'society_cardealer', function(account)
 					account.addMoney(300)
 				end)				
 				isFound = true
@@ -72,7 +72,7 @@ ESX.RegisterServerCallback("pz_tulcars:TryToCreateOffer", function(source, cb, v
 	end)
 end)
 
-ESX.RegisterServerCallback("pz_tulcars:GetInfoAboutVehicle", function(source, cb, id)
+ESX.RegisterServerCallback("esx_tulcars:GetInfoAboutVehicle", function(source, cb, id)
 	local src = source
 	local xPlayer = ESX.GetPlayerFromId(src)
     
@@ -91,7 +91,7 @@ ESX.RegisterServerCallback("pz_tulcars:GetInfoAboutVehicle", function(source, cb
     end)
 end)
 
-ESX.RegisterServerCallback("pz_tulcars:Cancel", function(source, cb, id)
+ESX.RegisterServerCallback("esx_tulcars:Cancel", function(source, cb, id)
 	local src = source
 	local xPlayer = ESX.GetPlayerFromId(src)
     local completed = false
@@ -112,7 +112,7 @@ ESX.RegisterServerCallback("pz_tulcars:Cancel", function(source, cb, id)
 						["@plate"] = json.decode(result[1]["vehicleProps"]).plate,
                     }
                 )	
-                TriggerClientEvent("pz_tulcars:refreshVehicles", -1)				
+                TriggerClientEvent("esx_tulcars:refreshVehicles", -1)				
 				completed = true
 			end
 
@@ -122,7 +122,7 @@ ESX.RegisterServerCallback("pz_tulcars:Cancel", function(source, cb, id)
     end)
 end)
 
-ESX.RegisterServerCallback("pz_tulcars:Cancel", function(source, cb, id)
+ESX.RegisterServerCallback("esx_tulcars:Cancel", function(source, cb, id)
 	local src = source
 	local xPlayer = ESX.GetPlayerFromId(src)
     local completed = false
@@ -143,7 +143,7 @@ ESX.RegisterServerCallback("pz_tulcars:Cancel", function(source, cb, id)
 						["@plate"] = json.decode(result[1]["vehicleProps"]).plate,
                     }
                 )	
-                TriggerClientEvent("pz_tulcars:refreshVehicles", -1)				
+                TriggerClientEvent("esx_tulcars:refreshVehicles", -1)				
 				completed = true
 			end
 
@@ -179,7 +179,7 @@ function UpdateCash(identifier, cash)
 	if xPlayer ~= nil then
         xPlayer.addMoney(cash)
 
-		TriggerClientEvent("pz:showNotification", xPlayer.source, "~g~[KOMIS]~s~ Ktoś kupił Twoje auto. Zysk: ~g~" .. cash .. "~s~$")
+		TriggerClientEvent("esx:showNotification", xPlayer.source, "~g~[KOMIS]~s~ Ktoś kupił Twoje auto. Zysk: ~g~" .. cash .. "~s~$")
 	else
 		MySQL.Async.fetchAll('SELECT bank FROM users WHERE identifier = @identifier', { ["@identifier"] = identifier }, function(result)
 			if result[1]["bank"] ~= nil then
@@ -194,7 +194,7 @@ function UpdateCash(identifier, cash)
 	end
 end
 
-ESX.RegisterServerCallback("pz_tulcars:BuyVehicle", function(source, cb, id)
+ESX.RegisterServerCallback("esx_tulcars:BuyVehicle", function(source, cb, id)
 	local src = source
 	local xPlayer = ESX.GetPlayerFromId(src)
 	local seller = 0
@@ -221,7 +221,7 @@ ESX.RegisterServerCallback("pz_tulcars:BuyVehicle", function(source, cb, id)
 						["@state"] = 1			
 					}
 				)	
-				TriggerClientEvent("pz_tulcars:refreshVehicles", -1)
+				TriggerClientEvent("esx_tulcars:refreshVehicles", -1)
 				done = true
 			end
         end
@@ -235,7 +235,7 @@ function PayRent(d, h, m)
 			local xPlayer = ESX.GetPlayerFromIdentifier(result[i]["seller"])
 			if xPlayer then
 				xPlayer.removeAccountMoney('bank', 500)
-				TriggerClientEvent('pz:showNotification', xPlayer.source, _U('paid_rent', 500))
+				TriggerClientEvent('esx:showNotification', xPlayer.source, _U('paid_rent', 500))
 			else
 				MySQL.Sync.execute('UPDATE users SET bank = bank - @bank WHERE identifier = @identifier', {
 					['@bank']       = 500,
@@ -243,7 +243,7 @@ function PayRent(d, h, m)
 				})
 			end
 
-			TriggerEvent('pz_addonaccount:getSharedAccount', 'society_cardealer', function(account)
+			TriggerEvent('esx_addonaccount:getSharedAccount', 'society_cardealer', function(account)
 				account.addMoney(500)
 			end)
 		end

@@ -8,7 +8,7 @@ Citizen.CreateThread(function()
     while ESX == nil do
         Citizen.Wait(10)
 
-        TriggerEvent("pz:getSharedObject", function(response)
+        TriggerEvent("esx:getSharedObject", function(response)
             ESX = response
         end)
     end
@@ -26,8 +26,8 @@ Citizen.CreateThread(function()
 
 end)
 
-RegisterNetEvent("pz:playerLoaded")
-AddEventHandler("pz:playerLoaded", function(response)
+RegisterNetEvent("esx:playerLoaded")
+AddEventHandler("esx:playerLoaded", function(response)
 	PlayerData = ESX.GetPlayerData()
 	RemoveVehicles()
 	Citizen.Wait(1000)	
@@ -38,13 +38,13 @@ AddEventHandler("pz:playerLoaded", function(response)
 	CreateBlip()
 end)
 
-RegisterNetEvent('pz:setJob')
-AddEventHandler('pz:setJob', function(job)
+RegisterNetEvent('esx:setJob')
+AddEventHandler('esx:setJob', function(job)
 	PlayerData.job = job
 end)
 
-RegisterNetEvent("pz_tulcars:refreshVehicles")
-AddEventHandler("pz_tulcars:refreshVehicles", function()
+RegisterNetEvent("esx_tulcars:refreshVehicles")
+AddEventHandler("esx_tulcars:refreshVehicles", function()
 	RemoveVehicles()
 	Citizen.Wait(1000)
 	SpawnVehicles()
@@ -70,7 +70,7 @@ function LoadSellPlace()
 	emptySlots = {}
 	local loaded = false
 	while not loaded do
-		ESX.TriggerServerCallback("pz_tulcars:retrieveVehicles", function(vehicles)
+		ESX.TriggerServerCallback("esx_tulcars:retrieveVehicles", function(vehicles)
 			for i = 1, #vehicles, 1 do
 				if string.len(vehicles[i]["seller"]) > 1 then			
 					table.insert(emptySlots, {["id"] = nil})
@@ -110,7 +110,7 @@ function LoadSellPlace()
 						if IsControlJustPressed(0, 38) then
 							if IsPedInAnyVehicle(ped, false) then
 								local vehicleProperties = ESX.Game.GetVehicleProperties(GetVehiclePedIsIn(ped, false))
-								ESX.TriggerServerCallback("pz_tulcars:IsVehiclePlayerProperty", function(callback)
+								ESX.TriggerServerCallback("esx_tulcars:IsVehiclePlayerProperty", function(callback)
 									if callback then
 										OpenSellMenu(GetVehiclePedIsIn(ped, false), i)											
 									else
@@ -144,7 +144,7 @@ function LoadSellPlace()
 	end)
 end
 function OpenBuyMenu(id)
-	ESX.TriggerServerCallback("pz_tulcars:GetInfoAboutVehicle", function(vehicle)
+	ESX.TriggerServerCallback("esx_tulcars:GetInfoAboutVehicle", function(vehicle)
 		local seller = vehicle[1]["seller"]
 		local vehProps = vehicle[1]["vehProps"]
 		local price = vehicle[1]["price"]
@@ -192,7 +192,7 @@ function OpenBuyMenu(id)
 			local action = data.current.value
 
 			if action == "accept" then
-				ESX.TriggerServerCallback("pz_tulcars:BuyVehicle", function(valid)
+				ESX.TriggerServerCallback("esx_tulcars:BuyVehicle", function(valid)
 					if valid then
 						local VehPos = Config.VehiclePositions
 						DeleteVehicle(VehPos[id]["entityId"])
@@ -205,7 +205,7 @@ function OpenBuyMenu(id)
 		
 				end, id)
 			elseif action == "cancel" then
-				ESX.TriggerServerCallback("pz_tulcars:Cancel", function(completed)
+				ESX.TriggerServerCallback("esx_tulcars:Cancel", function(completed)
 					if completed then
 						DeleteVehicle(GetVehiclePedIsIn(PlayerPedId()))
 						ESX.ShowNotification("Anulowałeś ofertę sprzedaży!")
@@ -258,7 +258,7 @@ function OpenSellMenu(veh, id, price)
 				menu2.close()
 			end)
 		elseif action == "accept" then
-			ESX.TriggerServerCallback("pz_tulcars:TryToCreateOffer", function(valid)
+			ESX.TriggerServerCallback("esx_tulcars:TryToCreateOffer", function(valid)
 				if valid then
 					DeleteVehicle(veh)
 					TeleportPlayerToCoords()
@@ -314,7 +314,7 @@ end
 function SpawnVehicles()
 	local VehPos = Config.VehiclePositions
 	refreshing = true
-	ESX.TriggerServerCallback("pz_tulcars:retrieveVehicles", function(vehicles)
+	ESX.TriggerServerCallback("esx_tulcars:retrieveVehicles", function(vehicles)
 		for i = 1, #vehicles, 1 do
 			if string.len(vehicles[i]["seller"]) > 1 then
 				local vehicleProps = vehicles[i]["vehProps"]
