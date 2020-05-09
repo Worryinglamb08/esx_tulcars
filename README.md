@@ -1,5 +1,6 @@
 # esx_tulcars
 
+!!! CHANGE "pz:" TO "esx:" and "esx_" IN SCRIPT!!!
 [NOTES]
 
 * This gives you the opportunity to put your cars with daily rent (customizable inside code) into used-cars car dealer.
